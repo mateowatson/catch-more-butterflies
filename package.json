@@ -1,0 +1,20 @@
+{
+  "name": "butterfly-catching",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "mix",
+    "watch": "mix watch",
+    "prod": "mix --production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "laravel-mix": "^6.0.37"
+  },
+  "dependencies": {
+    "phaser": "^3.55.2"
+  }
+}
