@@ -5,7 +5,21 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [Game]
+    scene: [Game],
+    physics: {
+        default: 'matter',
+        matter: {
+            enableSleeping: true,
+            gravity: {
+                y: 0
+            },
+            setBounds: true,
+            debug: {
+                showBody: true,
+                showStaticBody: true
+            }
+        }
+    }
 };
 
 new Phaser.Game(config);
