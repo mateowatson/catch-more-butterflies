@@ -35,6 +35,7 @@ export default class Game extends Phaser.Scene {
 
     update() {
         if(!this.input.activePointer.isDown && this.isDrawing) {
+            this.strokes.push(this.path);
             this.isDrawing = false;
         } else if(this.input.activePointer.isDown) {
             if(!this.isDrawing) {
