@@ -20,7 +20,9 @@ export default class Game extends Phaser.Scene {
         this.welcomeText = null;
         this.startButton = null;
         this.confirmButton = null;
+        this.isConfirmed = false;
         this.cancelButton = null;
+        this.isCancelled = false;
     }
 
     preload() {
@@ -64,8 +66,8 @@ export default class Game extends Phaser.Scene {
         if(this.stage === 'player1Path>confirm' && !this.cancelButton) {
             this.setCancelButton('Cancel', 600, 580);
         }
-        if(this.stage === 'player1Path>confirm' && this.confirmButton) {
-            //this.setCancelButton('Cancel', 600, 580);
+        if(this.stage === 'player1Path>confirm' && this.confirmButton && this.isConfirmed) {
+            //this.stage = 'player2Path';
         }
         if(this.stage === 'player2Path>confirm' && !this.confirmButton) {
             this.setConfirmButton('Confirm!', 200, 580);
@@ -184,7 +186,18 @@ export default class Game extends Phaser.Scene {
         })
         .on('pointerout', function() {
             this.setBackgroundColor('#c500c3');
-        });
+        })
+        .on('pointerup', function() {
+            this.isConfirmed = true;
+            this.path = null;
+            if(this.stage === 'player1Path>confirm') {
+                this.stage = 'player2Path';
+            } else if(this.stage === 'player2Path>confirm') {
+                this.stage = 'countdown';
+            }
+            this.confirmButton.destroy();
+            this.cancelButton.destroy();
+        }, this);
     }
 
     setCancelButton(text, x, y) {
@@ -211,6 +224,17 @@ export default class Game extends Phaser.Scene {
         })
         .on('pointerout', function() {
             this.setBackgroundColor('#fff');
+        })
+        .on('pointerup', function() {
+            this.isConfirmed = false;
+            this.path = null;
+            if(this.stage === 'player1Path>confirm') {
+                this.stage = 'player1Path';
+            } else if(this.stage === 'player2Path>confirm') {
+                this.stage = 'player2Path';
+            }
+            this.confirmButton.destroy();
+            this.cancelButton.destroy();
         });
     }
 
