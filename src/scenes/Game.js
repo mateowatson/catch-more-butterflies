@@ -10,14 +10,17 @@ export default class Game extends Phaser.Scene {
         this.butterflies = [];
         this.player1 = null;
         this.player2 = null;
-        this.player1Stroke = null;
-        this.player2Stroke = null;
+        this.player1Path = null;
+        this.player2Path = null;
         // welcome, player1Path>confirm, player2Path>confirm
         // countdown, ingame, endgame, results
         this.stage = 'welcome';
+        this.stageText = null;
         this.isDrawing = false;
         this.welcomeText = null;
         this.startButton = null;
+        this.confirmButton = null;
+        this.cancelButton = null;
     }
 
     preload() {
@@ -39,11 +42,36 @@ export default class Game extends Phaser.Scene {
         this.graphics.lineStyle(4, 0x000000);
         this.setWelcomeText();
         this.setStartButton();
+        this.setStageText();
     }
 
     update() {
+        this.stageText.setText(this.stage);
         if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             this.enableDrawing();
+        }
+        if(this.stage === 'player1Path' && !this.player1Path && this.path && !this.isDrawing) {
+            this.player1Path = this.path;
+            this.stage = 'player1Path>confirm';
+        }
+        if(this.stage === 'player2Path' && !this.player2Path && this.path && !this.isDrawing) {
+            this.player2Path = this.path;
+            this.stage = 'player2Path>confirm';
+        }
+        if(this.stage === 'player1Path>confirm' && !this.confirmButton) {
+            this.setConfirmButton('Confirm!', 200, 580);
+        }
+        if(this.stage === 'player1Path>confirm' && !this.cancelButton) {
+            this.setCancelButton('Cancel', 600, 580);
+        }
+        if(this.stage === 'player1Path>confirm' && this.confirmButton) {
+            //this.setCancelButton('Cancel', 600, 580);
+        }
+        if(this.stage === 'player2Path>confirm' && !this.confirmButton) {
+            this.setConfirmButton('Confirm!', 200, 580);
+        }
+        if(this.stage === 'player2Path>confirm' && !this.cancelButton) {
+            this.setCancelButton('Cancel', 600, 580);
         }
     }
 
@@ -79,13 +107,6 @@ export default class Game extends Phaser.Scene {
             fontFamily: 'sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#c500c3',
-            // shadow: {
-            //     offsetX: 2,
-            //     offsetY: 2,
-            //     blur: 2,
-            //     stroke: true,
-            //     color: '#000'
-            // },
             padding: {
                 x: 12,
                 y: 12
@@ -106,17 +127,96 @@ export default class Game extends Phaser.Scene {
         .on('pointerout', function() {
             this.setBackgroundColor('#c500c3');
         })
-        .on('pointerdown', function() {
-            this.stage = 'player1Path';
+        .on('pointerup', function() {
             this.startButton.destroy();
             this.welcomeText.destroy();
+            this.stage = 'player1Path';
         }, this);
+    }
+
+    setStageText() {
+        this.stageText = this.add.text(0, 0, 'welcome', {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            //backgroundColor: '#134900',
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                blur: 2,
+                stroke: true,
+                color: '#000'
+            },
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '16px',
+            stroke: '#000',
+            strokeThickness: 2,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        });
+    }
+
+    setConfirmButton(text, x, y) {
+        this.confirmButton = this.add.text(x, y, text, {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            backgroundColor: '#c500c3',
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '20px',
+            stroke: '#000',
+            strokeThickness: 4,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        })
+        .setOrigin(.5, 1)
+        .setInteractive()
+        .on('pointerover', function() {
+            this.setBackgroundColor('#ff6cfe');
+        })
+        .on('pointerout', function() {
+            this.setBackgroundColor('#c500c3');
+        });
+    }
+
+    setCancelButton(text, x, y) {
+        this.cancelButton = this.add.text(x, y, text, {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            backgroundColor: '#fff',
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '20px',
+            stroke: '#000',
+            strokeThickness: 4,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        })
+        .setOrigin(.5, 1)
+        .setInteractive()
+        .on('pointerover', function() {
+            this.setBackgroundColor('#ddd');
+        })
+        .on('pointerout', function() {
+            this.setBackgroundColor('#fff');
+        });
     }
 
     enableDrawing() {
         // enable drawing
         if(!this.input.activePointer.isDown && this.isDrawing) {
-            //this.strokes.push(this.path);
             this.isDrawing = false;
         } else if(this.input.activePointer.isDown) {
             if(!this.isDrawing) {
