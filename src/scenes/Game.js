@@ -10,8 +10,14 @@ export default class Game extends Phaser.Scene {
         this.butterflies = [];
         this.player1 = null;
         this.player2 = null;
-        this.strokes = [];
+        this.player1Stroke = null;
+        this.player2Stroke = null;
+        // welcome, player1Path>confirm, player2Path>confirm
+        // countdown, ingame, endgame, results
+        this.stage = 'welcome';
         this.isDrawing = false;
+        this.welcomeText = null;
+        this.startButton = null;
     }
 
     preload() {
@@ -31,11 +37,86 @@ export default class Game extends Phaser.Scene {
         }
         this.graphics = this.add.graphics();
         this.graphics.lineStyle(4, 0x000000);
+        this.setWelcomeText();
+        this.setStartButton();
     }
 
     update() {
+        if(this.stage === 'player1Path' || this.stage === 'player2Path') {
+            this.enableDrawing();
+        }
+    }
+
+    setWelcomeText() {
+        this.welcomeText = this.add.text(400, 500, 'Welcome to the field of butterflies. Each player will draw a line of the path they will take. Ready?', {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            //backgroundColor: '#134900',
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                blur: 2,
+                stroke: true,
+                color: '#000'
+            },
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fixedWidth: 700,
+            fontSize: '16px',
+            stroke: '#000',
+            strokeThickness: 2,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        }).setOrigin(.5, 1);
+    }
+
+    setStartButton() {
+        this.startButton = this.add.text(400, 580, 'Start!', {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            backgroundColor: '#c500c3',
+            // shadow: {
+            //     offsetX: 2,
+            //     offsetY: 2,
+            //     blur: 2,
+            //     stroke: true,
+            //     color: '#000'
+            // },
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '20px',
+            stroke: '#000',
+            strokeThickness: 4,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        })
+        .setOrigin(.5, 1)
+        .setInteractive()
+        .on('pointerover', function() {
+            this.setBackgroundColor('#ff6cfe');
+        })
+        .on('pointerout', function() {
+            this.setBackgroundColor('#c500c3');
+        })
+        .on('pointerdown', function() {
+            this.stage = 'player1Path';
+            this.startButton.destroy();
+            this.welcomeText.destroy();
+        }, this);
+    }
+
+    enableDrawing() {
+        // enable drawing
         if(!this.input.activePointer.isDown && this.isDrawing) {
-            this.strokes.push(this.path);
+            //this.strokes.push(this.path);
             this.isDrawing = false;
         } else if(this.input.activePointer.isDown) {
             if(!this.isDrawing) {
