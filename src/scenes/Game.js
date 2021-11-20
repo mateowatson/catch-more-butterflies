@@ -10,8 +10,11 @@ export default class Game extends Phaser.Scene {
         this.butterflies = [];
         this.player1 = null;
         this.player2 = null;
+        this.path = null;
         this.player1Path = null;
         this.player2Path = null;
+        this.player1GraphicsLine = null;
+        this.player2GraphicsLine = null;
         // welcome, player1Path>confirm, player2Path>confirm
         // countdown, ingame, endgame, results
         this.stage = 'welcome';
@@ -38,8 +41,8 @@ export default class Game extends Phaser.Scene {
         for(let i = 0; i < 15; i++) {
             this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
         }
-        this.graphics = this.add.graphics();
-        this.graphics.lineStyle(4, 0x000000);
+        this.setPlayer1GraphicsLine();
+        this.setPlayer2GraphicsLine();
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
@@ -81,6 +84,16 @@ export default class Game extends Phaser.Scene {
         if(this.stage === 'player2Path>confirm' && !this.cancelButton) {
             this.setCancelButton('Cancel', 600, 580);
         }
+    }
+
+    setPlayer1GraphicsLine() {
+        this.player1GraphicsLine = this.add.graphics();
+        this.player1GraphicsLine.lineStyle(4, 0x000000);
+    }
+
+    setPlayer2GraphicsLine() {
+        this.player2GraphicsLine = this.add.graphics();
+        this.player2GraphicsLine.lineStyle(4, 0x000000);
     }
 
     setWelcomeText() {
@@ -231,9 +244,13 @@ export default class Game extends Phaser.Scene {
         .on('pointerup', function() {
             this.path = null;
             if(this.stage === 'player1Path>confirm') {
+                this.player1GraphicsLine.destroy();
+                this.setPlayer1GraphicsLine();
                 this.player1Path = null;
                 this.stage = 'player1Path';
             } else if(this.stage === 'player2Path>confirm') {
+                this.player2GraphicsLine.destroy();
+                this.setPlayer2GraphicsLine();
                 this.player2Path = null;
                 this.stage = 'player2Path';
             }
@@ -251,7 +268,12 @@ export default class Game extends Phaser.Scene {
             } else {
                 this.path.lineTo(this.input.activePointer.position.x - 2, this.input.activePointer.position.y - 2);
             }
-            this.path.draw(this.graphics);
+            if(this.stage === 'player1Path') {
+                this.path.draw(this.player1GraphicsLine);
+            } else if(this.stage === 'player2Path') {
+                this.path.draw(this.player2GraphicsLine);
+            }
+            
         }
     }
 }
