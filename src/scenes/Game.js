@@ -48,9 +48,9 @@ export default class Game extends Phaser.Scene {
         this.setStageText();
     }
 
-    update() {
+    update(time, delta) {
         this.stageText.setText(this.stage);
-        if(this.stage === 'player1Path' || this.stage === 'player2Path' || this.stage === 'countdown') {
+        if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             if(this.confirmButton) {
                 this.confirmButton.destroy();
                 this.confirmButton = null;
@@ -75,14 +75,41 @@ export default class Game extends Phaser.Scene {
         if(this.stage === 'player1Path>confirm' && !this.cancelButton) {
             this.setCancelButton('Cancel', 600, 580);
         }
-        if(this.stage === 'player1Path>confirm' && this.confirmButton && this.isConfirmed) {
-            //this.stage = 'player2Path';
-        }
         if(this.stage === 'player2Path>confirm' && !this.confirmButton) {
             this.setConfirmButton('Confirm!', 200, 580);
         }
         if(this.stage === 'player2Path>confirm' && !this.cancelButton) {
             this.setCancelButton('Cancel', 600, 580);
+        }
+        if(this.stage === 'ingame') {
+            if(this.confirmButton) {
+                this.confirmButton.destroy();
+                this.confirmButton = null;
+            }
+            if(this.cancelButton) {
+                this.cancelButton.destroy();
+                this.cancelButton = null;
+            }
+            if(!this.player1PathPoints) {
+                this.player1PathPoints = this.player1Path.getSpacedPoints(this.player1Path.getLength());
+                this.player1PointOnPath = 0;
+                this.player1.setPosition(this.player1PathPoints[0].x, this.player1PathPoints[0].y);
+            } else {
+                this.player1PointOnPath = this.player1PointOnPath + (delta/10);
+                if(this.player1PointOnPath < this.player1Path.getLength()) {
+                    this.player1.setPosition(this.player1PathPoints[Math.floor(this.player1PointOnPath)].x, this.player1PathPoints[Math.floor(this.player1PointOnPath)].y);
+                }
+            }
+            if(!this.player2PathPoints) {
+                this.player2PathPoints = this.player2Path.getSpacedPoints(this.player2Path.getLength());
+                this.player2PointOnPath = 0;
+                this.player2.setPosition(this.player2PathPoints[0].x, this.player2PathPoints[0].y);
+            } else {
+                this.player2PointOnPath = this.player2PointOnPath + (delta/10);
+                if(this.player2PointOnPath < this.player2Path.getLength()) {
+                    this.player2.setPosition(this.player2PathPoints[Math.floor(this.player2PointOnPath)].x, this.player2PathPoints[Math.floor(this.player2PointOnPath)].y);
+                }
+            }
         }
     }
 
@@ -211,7 +238,8 @@ export default class Game extends Phaser.Scene {
             if(this.stage === 'player1Path>confirm') {
                 this.stage = 'player2Path';
             } else if(this.stage === 'player2Path>confirm') {
-                this.stage = 'countdown';
+                // skipping countdown for now
+                this.stage = 'ingame';
             }
         }, this);
     }
