@@ -36,8 +36,18 @@ export default class Game extends Phaser.Scene {
 
     create() {
         this.field = this.add.image(400, 300, 'field');
-        this.player1 = this.add.image(20, 20, 'player');
-        this.player2 = this.add.image(780, 580, 'player');
+        this.player1Image = this.add.image(0, 0, 'player');
+        this.player1Net = this.add.image(0, 0, 'net');
+        this.player1 = this.add.container(20, 20, [this.player1Image, this.player1Net]);
+        this.player2Image = this.add.image(0, 0, 'player');
+        this.player2Net = this.add.image(0, 0, 'net');
+        this.player2 = this.add.container(780, 580, [this.player2Image, this.player2Net]);
+        this.player1Net.setOrigin(0, 0);
+        this.player1Net.angle = 90;
+        this.player1Net.setPosition(29, 12)
+        this.player2Net.setOrigin(0, 0);
+        this.player2Net.angle = 90;
+        this.player2Net.setPosition(29, 12)
         for(let i = 0; i < 15; i++) {
             this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
         }
@@ -95,7 +105,7 @@ export default class Game extends Phaser.Scene {
                 this.player1PointOnPath = 0;
                 this.player1.setPosition(this.player1PathPoints[0].x, this.player1PathPoints[0].y);
             } else {
-                this.player1PointOnPath = this.player1PointOnPath + (delta/10);
+                this.player1PointOnPath = this.player1PointOnPath + (30/delta);
                 if(this.player1PointOnPath < this.player1Path.getLength()) {
                     this.player1.setPosition(this.player1PathPoints[Math.floor(this.player1PointOnPath)].x, this.player1PathPoints[Math.floor(this.player1PointOnPath)].y);
                 }
@@ -105,7 +115,7 @@ export default class Game extends Phaser.Scene {
                 this.player2PointOnPath = 0;
                 this.player2.setPosition(this.player2PathPoints[0].x, this.player2PathPoints[0].y);
             } else {
-                this.player2PointOnPath = this.player2PointOnPath + (delta/10);
+                this.player2PointOnPath = this.player2PointOnPath + (30/delta);
                 if(this.player2PointOnPath < this.player2Path.getLength()) {
                     this.player2.setPosition(this.player2PathPoints[Math.floor(this.player2PointOnPath)].x, this.player2PathPoints[Math.floor(this.player2PointOnPath)].y);
                 }
