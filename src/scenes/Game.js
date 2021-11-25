@@ -326,22 +326,28 @@ export default class Game extends Phaser.Scene {
             var x2 = pNextPoint.x;
             var y2 = pNextPoint.y;
             var slope = (y2 - y1)/(x2 - x1);
-            if(x1 < x2 && y1 < y2) {
-                //arc tangent
-                var pAngle = Math.atan(slope) + 1.570796;
-                // arc cotangent
-                //var pAngle = Math.PI / 2 - Math.atan(slope);
-            } else if(x1 <= x2 && y1 >= y2) {
-                //arc tangent
-                var pAngle = Math.atan(slope);
-            } else if(x1 > x2 && y1 > y2) {
-                //arc tangent
-                var pAngle = Math.atan(slope) + Math.PI;
-            } else if(x1 > x2 && y1 < y2) {
-                //arc tangent
-                var pAngle = Math.atan(slope) + 4.712;
+            var pAngle = null;
+            if(x1 === x2) {
+                slope = 0;
             }
-            player.setRotation(pAngle - 1.570796);
+            if(x1 === x2 && y1 < y2) {
+                pAngle = Math.PI;
+            } else if(x1 === x2 && y1 > y2) {
+                pAngle = 0;
+            } else if(y1 === y2 && x1 < x2) {
+                pAngle = Math.PI - Math.PI/2;
+            } else if(y1 === y2 && x1 > x2) {
+                pAngle = 2*Math.PI - Math.PI/2;
+            } else if(x1 < x2 && y1 < y2) {
+                pAngle = Math.atan(slope) + Math.PI/2;
+            } else if(x1 < x2 && y1 > y2) {
+                pAngle = Math.atan(slope) + Math.PI - Math.PI/2;
+            } else if(x1 > x2 && y1 > y2) {
+                pAngle = Math.atan(slope) + 3*Math.PI/2;
+            } else if(x1 > x2 && y1 < y2) {
+                pAngle = Math.atan(slope) + 2*Math.PI - Math.PI/2;
+            }
+            player.rotation = pAngle - Math.PI;
         }
     }
 
@@ -353,7 +359,7 @@ export default class Game extends Phaser.Scene {
             let p1NextX = p1NextPoint.x;
             let p1NextY = p1NextPoint.y;
             let p1Angle = Math.atan((Math.abs(p1NextY - p1y))/Math.abs((p1NextX - p1x)));
-            player.rotation = p1Angle - 1.570796;
+            player.rotation = p1Angle - Math.PI/2;
         }
     }
 }
