@@ -7,18 +7,18 @@ var config = {
     height: 600,
     scene: [Game],
     physics: {
-        default: 'matter',
-        matter: {
-            enableSleeping: true,
-            gravity: {
-                y: 0
-            },
-            setBounds: true,
-            debug: {
-                showBody: true,
-                showStaticBody: true
-            }
-        }
+        default: 'arcade',
+        // matter: {
+        //     enableSleeping: true,
+        //     gravity: {
+        //         y: 0
+        //     },
+        //     setBounds: true,
+        //     debug: {
+        //         showBody: true,
+        //         showStaticBody: true
+        //     }
+        // }
     }
 };
 

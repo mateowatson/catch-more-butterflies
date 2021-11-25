@@ -39,10 +39,10 @@ export default class Game extends Phaser.Scene {
     create() {
         this.field = this.add.image(400, 300, 'field');
         this.player1Image = this.add.image(0, 0, 'player');
-        this.player1Net = this.add.image(0, 0, 'net');
+        this.player1Net = this.physics.add.image(0, 0, 'net');
         this.player1 = this.add.container(20, 20, [this.player1Image, this.player1Net]);
         this.player2Image = this.add.image(0, 0, 'player');
-        this.player2Net = this.add.image(0, 0, 'net');
+        this.player2Net = this.physics.add.image(0, 0, 'net');
         this.player2 = this.add.container(780, 580, [this.player2Image, this.player2Net]);
         this.player1Net.setOrigin(0, 1);
         this.player1Net.angle = -50;
@@ -52,13 +52,15 @@ export default class Game extends Phaser.Scene {
         this.player2Net.angle = -50;
         this.player2Net.setPosition(playerBottomCenter.x - 2, playerBottomCenter.y)
         for(let i = 0; i < 15; i++) {
-            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
+            this.butterflies.push(this.physics.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
         }
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
+        this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
+        this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
         this.input.on('pointerdown', this.handlePointerDown, this);
         this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this)
     }
@@ -384,5 +386,9 @@ export default class Game extends Phaser.Scene {
         if(this.stage === 'ingame' && this.player2NetIsSwinging === false) {
             this.player2NetIsSwinging = true;
         }
+    }
+
+    collectButterfly(player, butterfly) {
+        butterfly.destroy();
     }
 }
