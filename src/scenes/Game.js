@@ -120,6 +120,9 @@ export default class Game extends Phaser.Scene {
                     this.player2.setPosition(this.player2PathPoints[Math.floor(this.player2PointOnPath)].x, this.player2PathPoints[Math.floor(this.player2PointOnPath)].y);
                 }
             }
+            // turn man toward next coordinate on the line
+            this.setPlayerRotation(this.player1, this.player1PointOnPath, this.player1PathPoints);
+            this.setPlayerRotation(this.player2, this.player2PointOnPath, this.player2PathPoints);
         }
     }
 
@@ -312,6 +315,45 @@ export default class Game extends Phaser.Scene {
                 this.path.draw(this.player2GraphicsLine);
             }
             
+        }
+    }
+
+    setPlayerRotation(player, playerPointOnPath, pathPoints) {
+        var x1 = player.x;
+        var y1 = player.y;
+        var pNextPoint = pathPoints[Math.floor(playerPointOnPath + 1)];
+        if(pNextPoint) {
+            var x2 = pNextPoint.x;
+            var y2 = pNextPoint.y;
+            var slope = (y2 - y1)/(x2 - x1);
+            if(x1 < x2 && y1 < y2) {
+                //arc tangent
+                var pAngle = Math.atan(slope) + 1.570796;
+                // arc cotangent
+                //var pAngle = Math.PI / 2 - Math.atan(slope);
+            } else if(x1 <= x2 && y1 >= y2) {
+                //arc tangent
+                var pAngle = Math.atan(slope);
+            } else if(x1 > x2 && y1 > y2) {
+                //arc tangent
+                var pAngle = Math.atan(slope) + Math.PI;
+            } else if(x1 > x2 && y1 < y2) {
+                //arc tangent
+                var pAngle = Math.atan(slope) + 4.712;
+            }
+            player.setRotation(pAngle - 1.570796);
+        }
+    }
+
+    setPlayerRotationOld(player, playerPointOnPath, pathPoints) {
+        let p1x = player.x;
+        let p1y = player.y;
+        let p1NextPoint = pathPoints[Math.floor(playerPointOnPath + 1)];
+        if(p1NextPoint) {
+            let p1NextX = p1NextPoint.x;
+            let p1NextY = p1NextPoint.y;
+            let p1Angle = Math.atan((Math.abs(p1NextY - p1y))/Math.abs((p1NextX - p1x)));
+            player.rotation = p1Angle - 1.570796;
         }
     }
 }
