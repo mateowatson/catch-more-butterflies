@@ -24,6 +24,8 @@ export default class Game extends Phaser.Scene {
         this.startButton = null;
         this.confirmButton = null;
         this.cancelButton = null;
+        this.player1NetIsSwinging = false;
+        this.player2NetIsSwinging = false;
     }
 
     preload() {
@@ -42,12 +44,13 @@ export default class Game extends Phaser.Scene {
         this.player2Image = this.add.image(0, 0, 'player');
         this.player2Net = this.add.image(0, 0, 'net');
         this.player2 = this.add.container(780, 580, [this.player2Image, this.player2Net]);
-        this.player1Net.setOrigin(0, 0);
-        this.player1Net.angle = 90;
-        this.player1Net.setPosition(29, 12)
-        this.player2Net.setOrigin(0, 0);
-        this.player2Net.angle = 90;
-        this.player2Net.setPosition(29, 12)
+        this.player1Net.setOrigin(0, 1);
+        this.player1Net.angle = -50;
+        var playerBottomCenter = this.player1Image.getBottomCenter();
+        this.player1Net.setPosition(playerBottomCenter.x - 2, playerBottomCenter.y)
+        this.player2Net.setOrigin(0, 1);
+        this.player2Net.angle = -50;
+        this.player2Net.setPosition(playerBottomCenter.x - 2, playerBottomCenter.y)
         for(let i = 0; i < 15; i++) {
             this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
         }
@@ -56,10 +59,12 @@ export default class Game extends Phaser.Scene {
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
+        this.input.on('pointerdown', this.handlePointerDown, this);
+        this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this)
     }
 
     update(time, delta) {
-        this.stageText.setText(this.stage);
+        this.stageText.setText(this.stage + ' : '+this.player1Net.angle);
         if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             if(this.confirmButton) {
                 this.confirmButton.destroy();
@@ -123,6 +128,23 @@ export default class Game extends Phaser.Scene {
             // turn man toward next coordinate on the line
             this.setPlayerRotation(this.player1, this.player1PointOnPath, this.player1PathPoints);
             this.setPlayerRotation(this.player2, this.player2PointOnPath, this.player2PathPoints);
+            // set angle on net for swing
+            if(this.player1NetIsSwinging) {
+                if(this.player1Net.angle < -50 && this.player1Net.angle > -130 ) {
+                    this.player1Net.angle = -50;
+                    this.player1NetIsSwinging = false;
+                } else {
+                    this.player1Net.angle += delta * .50;
+                }
+            }
+            if(this.player2NetIsSwinging) {
+                if(this.player2Net.angle < -50 && this.player2Net.angle > -230 ) {
+                    this.player2Net.angle = -50;
+                    this.player2NetIsSwinging = false;
+                } else {
+                    this.player2Net.angle += delta * .50;
+                }
+            }
         }
     }
 
@@ -252,7 +274,8 @@ export default class Game extends Phaser.Scene {
                 this.stage = 'player2Path';
             } else if(this.stage === 'player2Path>confirm') {
                 // skipping countdown for now
-                this.stage = 'ingame';
+                setTimeout(() => {this.stage = 'ingame';}, 500);
+                
             }
         }, this);
     }
@@ -348,6 +371,18 @@ export default class Game extends Phaser.Scene {
                 pAngle = Math.atan(slope) + 2*Math.PI - Math.PI/2;
             }
             player.rotation = pAngle - Math.PI;
+        }
+    }
+
+    handlePointerDown() {
+        if(this.stage === 'ingame' && this.player1NetIsSwinging === false) {
+            this.player1NetIsSwinging = true;
+        }
+    }
+
+    handleKeydownSpace() {
+        if(this.stage === 'ingame' && this.player2NetIsSwinging === false) {
+            this.player2NetIsSwinging = true;
         }
     }
 }
