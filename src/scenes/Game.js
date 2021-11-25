@@ -105,7 +105,7 @@ export default class Game extends Phaser.Scene {
                 this.player1PointOnPath = 0;
                 this.player1.setPosition(this.player1PathPoints[0].x, this.player1PathPoints[0].y);
             } else {
-                this.player1PointOnPath = this.player1PointOnPath + (30/delta);
+                this.player1PointOnPath = this.player1PointOnPath + (delta * .1);
                 if(this.player1PointOnPath < this.player1Path.getLength()) {
                     this.player1.setPosition(this.player1PathPoints[Math.floor(this.player1PointOnPath)].x, this.player1PathPoints[Math.floor(this.player1PointOnPath)].y);
                 }
@@ -115,7 +115,7 @@ export default class Game extends Phaser.Scene {
                 this.player2PointOnPath = 0;
                 this.player2.setPosition(this.player2PathPoints[0].x, this.player2PathPoints[0].y);
             } else {
-                this.player2PointOnPath = this.player2PointOnPath + (30/delta);
+                this.player2PointOnPath = this.player2PointOnPath + (delta * .1);
                 if(this.player2PointOnPath < this.player2Path.getLength()) {
                     this.player2.setPosition(this.player2PathPoints[Math.floor(this.player2PointOnPath)].x, this.player2PathPoints[Math.floor(this.player2PointOnPath)].y);
                 }
@@ -348,18 +348,6 @@ export default class Game extends Phaser.Scene {
                 pAngle = Math.atan(slope) + 2*Math.PI - Math.PI/2;
             }
             player.rotation = pAngle - Math.PI;
-        }
-    }
-
-    setPlayerRotationOld(player, playerPointOnPath, pathPoints) {
-        let p1x = player.x;
-        let p1y = player.y;
-        let p1NextPoint = pathPoints[Math.floor(playerPointOnPath + 1)];
-        if(p1NextPoint) {
-            let p1NextX = p1NextPoint.x;
-            let p1NextY = p1NextPoint.y;
-            let p1Angle = Math.atan((Math.abs(p1NextY - p1y))/Math.abs((p1NextX - p1x)));
-            player.rotation = p1Angle - Math.PI/2;
         }
     }
 }
