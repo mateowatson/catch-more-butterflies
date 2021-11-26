@@ -39,30 +39,30 @@ export default class Game extends Phaser.Scene {
     create() {
         this.field = this.add.image(400, 300, 'field');
         this.player1Image = this.add.image(0, 0, 'player');
-        this.player1Net = this.physics.add.image(0, 0, 'net');
+        this.player1Net = this.add.image(0, 0, 'net');
         this.player1 = this.add.container(20, 20, [this.player1Image, this.player1Net]);
         this.player2Image = this.add.image(0, 0, 'player');
-        this.player2Net = this.physics.add.image(0, 0, 'net');
+        this.player2Net = this.add.image(0, 0, 'net');
         this.player2 = this.add.container(780, 580, [this.player2Image, this.player2Net]);
         this.player1Net.setOrigin(0, 1);
         this.player1Net.angle = -50;
-        var playerBottomCenter = this.player1Image.getBottomCenter();
-        this.player1Net.setPosition(playerBottomCenter.x - 2, playerBottomCenter.y)
+        this.player1Net.setPosition(0, 0)
         this.player2Net.setOrigin(0, 1);
         this.player2Net.angle = -50;
-        this.player2Net.setPosition(playerBottomCenter.x - 2, playerBottomCenter.y)
+        this.player2Net.setPosition(0, 0);
         for(let i = 0; i < 15; i++) {
-            this.butterflies.push(this.physics.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
+            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
         }
+        //this.butterfliesGroup = this.physics.add.group(this.butterflies);
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
-        this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
-        this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
+        // this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
+        // this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
         this.input.on('pointerdown', this.handlePointerDown, this);
-        this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this)
+        this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this);
     }
 
     update(time, delta) {
