@@ -26,6 +26,8 @@ export default class Game extends Phaser.Scene {
         this.cancelButton = null;
         this.player1NetIsSwinging = false;
         this.player2NetIsSwinging = false;
+        this.player1Points = 0;
+        this.player2Points = 0;
     }
 
     preload() {
@@ -66,7 +68,7 @@ export default class Game extends Phaser.Scene {
     }
 
     update(time, delta) {
-        this.stageText.setText(this.stage + ' : '+this.player1Net.angle);
+        this.stageText.setText('Player 1: '+this.player1Points+' - Player 2: '+this.player2Points);
         if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             if(this.confirmButton) {
                 this.confirmButton.destroy();
@@ -145,6 +147,28 @@ export default class Game extends Phaser.Scene {
                     this.player2NetIsSwinging = false;
                 } else {
                     this.player2Net.angle += delta * .50;
+                }
+            }
+            // detect net collision
+            for(let i = 0; i < this.butterflies.length; i++) {
+                let butterfly = this.butterflies[i];
+                //player1
+                let ray = new Phaser.Geom.Line(this.player1.x, this.player1.y, butterfly.x, butterfly.y);
+                let length = Phaser.Geom.Line.Length(ray);
+                let angle = Phaser.Geom.Line.Angle(ray);
+                let netAngle = this.player1Net.rotation - this.player1Net.getParentRotation();
+                if(length < 65 && length > 10 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
+                    butterfly.destroy();
+                    this.player1Points++;
+                }
+                //player2
+                let ray2 = new Phaser.Geom.Line(this.player2.x, this.player2.y, butterfly.x, butterfly.y);
+                let length2 = Phaser.Geom.Line.Length(ray2);
+                let angle2 = Phaser.Geom.Line.Angle(ray2);
+                let netAngle2 = this.player2Net.rotation - this.player2Net.getParentRotation();
+                if(length2 < 65 && length2 > 10 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
+                    butterfly.destroy();
+                    this.player2Points++;
                 }
             }
         }
