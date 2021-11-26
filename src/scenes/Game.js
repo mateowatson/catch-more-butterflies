@@ -151,23 +151,26 @@ export default class Game extends Phaser.Scene {
             }
             // detect net collision
             for(let i = 0; i < this.butterflies.length; i++) {
-                let butterfly = this.butterflies[i];
                 //player1
-                let ray = new Phaser.Geom.Line(this.player1.x, this.player1.y, butterfly.x, butterfly.y);
+                if(this.butterflies[i] === null) continue;
+                let ray = new Phaser.Geom.Line(this.player1.x, this.player1.y, this.butterflies[i].x, this.butterflies[i].y);
                 let length = Phaser.Geom.Line.Length(ray);
                 let angle = Phaser.Geom.Line.Angle(ray);
-                let netAngle = this.player1Net.rotation - this.player1Net.getParentRotation();
-                if(length < 65 && length > 10 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
-                    butterfly.destroy();
+                let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
+                if(length < 65 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
+                    this.butterflies[i].destroy();
+                    this.butterflies[i] = null;
                     this.player1Points++;
                 }
                 //player2
-                let ray2 = new Phaser.Geom.Line(this.player2.x, this.player2.y, butterfly.x, butterfly.y);
+                if(this.butterflies[i] === null) continue;
+                let ray2 = new Phaser.Geom.Line(this.player2.x, this.player2.y, this.butterflies[i].x, this.butterflies[i].y);
                 let length2 = Phaser.Geom.Line.Length(ray2);
                 let angle2 = Phaser.Geom.Line.Angle(ray2);
-                let netAngle2 = this.player2Net.rotation - this.player2Net.getParentRotation();
-                if(length2 < 65 && length2 > 10 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
-                    butterfly.destroy();
+                let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
+                if(length2 < 65 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
+                    this.butterflies[i].destroy();
+                    this.butterflies[i] = null;
                     this.player2Points++;
                 }
             }
