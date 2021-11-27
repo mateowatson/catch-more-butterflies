@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { cmb_random } from '../utils';
+import { cmb_random, cmb_random_arr_el } from '../utils';
 
 export default class Game extends Phaser.Scene {
     constructor() {
@@ -37,30 +37,34 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('field', '/assets/field.png');
-        this.load.image('butterfly', '/assets/butterfly.png');
-        this.load.image('net', '/assets/net.png');
-        this.load.image('obstacle', '/assets/obstacle.png');
-        this.load.image('player', '/assets/player.png');
+        this.load.image('grasstexture', '/assets/grasstexture.png');
+        this.load.image('butterfly-blue', '/assets/blue.png');
+        this.load.image('butterfly-white', '/assets/butterfly-white.png');
+        this.load.image('butterfly-monarch', '/assets/Monarch-butterfly.png');
+        this.load.image('butterfly-orange', '/assets/orange-butterfly.png');
+        this.load.image('tongue', '/assets/tongue.png');
+        this.load.image('obstacle-coneflower', '/assets/obstacle-coneflower.png');
+        this.load.image('obstacle-heliotrope', '/assets/obstacle-heliotrope.png');
+        this.load.image('obstacle-lantana', '/assets/obstacle-lantana.png');
+        this.load.image('player1', '/assets/player1.png');
+        this.load.image('player2', '/assets/player2.png');
     }
 
     create() {
-        this.field = this.add.image(400, 300, 'field');
-        this.player1Image = this.add.image(0, 0, 'player');
-        this.player1Net = this.add.image(0, 0, 'net');
-        this.player1 = this.add.container(20, 20, [this.player1Image, this.player1Net]);
-        this.player2Image = this.add.image(0, 0, 'player');
-        this.player2Net = this.add.image(0, 0, 'net');
-        this.player2 = this.add.container(780, 580, [this.player2Image, this.player2Net]);
+        this.field = this.add.tileSprite(400, 300, 800, 600, 'grasstexture');
+        this.player1Image = this.add.image(0, -20, 'player1').setRotation(Math.PI/4);
+        this.player1Net = this.add.image(0, 0, 'tongue');
+        this.player1 = this.add.container(50, 50, [this.player1Image, this.player1Net]);
+        this.player2Image = this.add.image(0, -20, 'player2').setRotation(Math.PI/4);
+        this.player2Net = this.add.image(0, 0, 'tongue');
+        this.player2 = this.add.container(750, 550, [this.player2Image, this.player2Net]);
         this.player1Net.setOrigin(0, 1);
         this.player1Net.angle = -50;
         this.player1Net.setPosition(0, 0)
         this.player2Net.setOrigin(0, 1);
         this.player2Net.angle = -50;
         this.player2Net.setPosition(0, 0);
-        for(let i = 0; i < 15; i++) {
-            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
-        }
+        this.setButterflies();
         //this.butterfliesGroup = this.physics.add.group(this.butterflies);
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
@@ -263,7 +267,7 @@ export default class Game extends Phaser.Scene {
     }
 
     setStageText() {
-        this.stageText = this.add.text(0, 0, 'welcome', {
+        this.stageText = this.add.text(400, 12, 'welcome', {
             fontFamily: 'sans-serif',
             fontStyle: 'bold',
             //backgroundColor: '#134900',
@@ -285,7 +289,7 @@ export default class Game extends Phaser.Scene {
                 width: 700
             },
             align: 'center'
-        });
+        }).setOrigin(.5, 0);
     }
 
     setConfirmButton(text, x, y) {
@@ -517,9 +521,7 @@ export default class Game extends Phaser.Scene {
             }
         }
         this.butterflies = [];
-        for(let i = 0; i < 15; i++) {
-            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
-        }
+        this.setButterflies();
         this.resultsText.destroy();
         this.resultsText = null;
         this.resetGameText.destroy();
@@ -527,5 +529,11 @@ export default class Game extends Phaser.Scene {
         this.stage = 'welcome';
         this.setWelcomeText();
         this.setStartButton();
+    }
+
+    setButterflies() {
+        for(let i = 0; i < 15; i++) {
+            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), cmb_random_arr_el(['butterfly-blue','butterfly-white','butterfly-monarch','butterfly-orange'])).setRotation(cmb_random(0, 6.28)));
+        }
     }
 }
