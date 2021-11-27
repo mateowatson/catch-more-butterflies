@@ -15,6 +15,8 @@ export default class Game extends Phaser.Scene {
         this.player2Path = null;
         this.player1GraphicsLine = null;
         this.player2GraphicsLine = null;
+        this.player1PathPoints = null;
+        this.player2PathPoints =null;
         // welcome, player1Path>confirm, player2Path>confirm
         // countdown, ingame, endgame, results
         this.stage = 'welcome';
@@ -28,6 +30,10 @@ export default class Game extends Phaser.Scene {
         this.player2NetIsSwinging = false;
         this.player1Points = 0;
         this.player2Points = 0;
+        this.player1IsDone = false;
+        this.player2IsDone = false;
+        this.resultsText = null;
+        this.resetGameText = null;
     }
 
     preload() {
@@ -69,6 +75,11 @@ export default class Game extends Phaser.Scene {
 
     update(time, delta) {
         this.stageText.setText('Player 1: '+this.player1Points+' - Player 2: '+this.player2Points);
+        if(this.player1IsDone && this.player2IsDone && this.stage === 'ingame') {
+            this.stage = 'endgame';
+            this.setResultsText();
+            this.setResetGameText();
+        }
         if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             if(this.confirmButton) {
                 this.confirmButton.destroy();
@@ -117,6 +128,8 @@ export default class Game extends Phaser.Scene {
                 this.player1PointOnPath = this.player1PointOnPath + (delta * .1);
                 if(this.player1PointOnPath < this.player1Path.getLength()) {
                     this.player1.setPosition(this.player1PathPoints[Math.floor(this.player1PointOnPath)].x, this.player1PathPoints[Math.floor(this.player1PointOnPath)].y);
+                } else {
+                    this.player1IsDone = true;
                 }
             }
             if(!this.player2PathPoints) {
@@ -127,6 +140,8 @@ export default class Game extends Phaser.Scene {
                 this.player2PointOnPath = this.player2PointOnPath + (delta * .1);
                 if(this.player2PointOnPath < this.player2Path.getLength()) {
                     this.player2.setPosition(this.player2PathPoints[Math.floor(this.player2PointOnPath)].x, this.player2PathPoints[Math.floor(this.player2PointOnPath)].y);
+                } else {
+                    this.player2IsDone = true;
                 }
             }
             // turn man toward next coordinate on the line
@@ -157,7 +172,7 @@ export default class Game extends Phaser.Scene {
                 let length = Phaser.Geom.Line.Length(ray);
                 let angle = Phaser.Geom.Line.Angle(ray);
                 let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
-                if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
+                if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.100) {
                     this.butterflies[i].destroy();
                     this.butterflies[i] = null;
                     this.player1Points++;
@@ -168,7 +183,8 @@ export default class Game extends Phaser.Scene {
                 let length2 = Phaser.Geom.Line.Length(ray2);
                 let angle2 = Phaser.Geom.Line.Angle(ray2);
                 let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
-                if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
+                if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.100
+                ) {
                     this.butterflies[i].destroy();
                     this.butterflies[i] = null;
                     this.player2Points++;
@@ -417,5 +433,99 @@ export default class Game extends Phaser.Scene {
 
     collectButterfly(player, butterfly) {
         butterfly.destroy();
+    }
+
+    setResultsText() {
+        var resultsMessage = ''
+        if(this.player1Points > this.player2Points) {
+            resultsMessage = 'Player 1 Wins!';
+        } else if(this.player2Points > this.player1Points) {
+            resultsMessage = 'Player 2 Wins!';
+        } else {
+            resultsMessage = 'Boo! It\'s a tie.';
+        }
+        this.resultsText = this.add.text(400, 300, resultsMessage, {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            backgroundColor: '#c500c3',
+            padding: {
+                x: 50,
+                y: 50
+            },
+            fontSize: '36px',
+            stroke: '#000',
+            strokeThickness: 4,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        })
+        .setOrigin(.5, .5);
+    }
+
+    setResetGameText() {
+        this.resetGameText = this.add.text(400, 580, 'Start Another Game', {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            backgroundColor: '#fff',
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '20px',
+            stroke: '#000',
+            strokeThickness: 4,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        })
+        .setOrigin(.5, 1)
+        .setInteractive()
+        .on('pointerover', function() {
+            this.setBackgroundColor('#ddd');
+        })
+        .on('pointerout', function() {
+            this.setBackgroundColor('#fff');
+        })
+        .on('pointerup', function() {
+            this.resetGame();
+        }, this);
+    }
+
+    resetGame() {
+        this.player1.setPosition(20, 20);
+        this.player2.setPosition(780, 580);
+        this.player1.rotation = 0;
+        this.player2.rotation = 0;
+        this.player1Points = 0;
+        this.player2Points = 0;
+        this.player1IsDone = false;
+        this.player2IsDone = false;
+        this.path = null;
+        this.player1GraphicsLine.destroy();
+        this.setPlayer1GraphicsLine();
+        this.player1Path = null;
+        this.player2GraphicsLine.destroy();
+        this.setPlayer2GraphicsLine();
+        this.player2Path = null;
+        this.player1PathPoints = null;
+        this.player2PathPoints =null;
+        for(let i = 0; i < this.butterflies.length; i++) {
+            if(this.butterflies[i]) {
+                this.butterflies[i].destroy();
+            }
+        }
+        this.butterflies = [];
+        for(let i = 0; i < 15; i++) {
+            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), 'butterfly'))
+        }
+        this.resultsText.destroy();
+        this.resultsText = null;
+        this.resetGameText.destroy();
+        this.resetGameText = null;
+        this.stage = 'welcome';
+        this.setWelcomeText();
+        this.setStartButton();
     }
 }
