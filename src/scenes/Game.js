@@ -15,6 +15,8 @@ export default class Game extends Phaser.Scene {
         this.player2Path = null;
         this.player1GraphicsLine = null;
         this.player2GraphicsLine = null;
+        this.player1LiveGraphicsLine = null;
+        this.player2LiveGraphicsLine = null;
         this.player1PathPoints = null;
         this.player2PathPoints =null;
         // welcome, player1Path>confirm, player2Path>confirm
@@ -34,6 +36,11 @@ export default class Game extends Phaser.Scene {
         this.player2IsDone = false;
         this.resultsText = null;
         this.resetGameText = null;
+        this.zIndexText = 6;
+        this.zIndexPlayer = 5;
+        this.zIndexLine = 4;
+        this.zIndexButterfly = 3;
+        this.lineAlfa = .6;
     }
 
     preload() {
@@ -52,12 +59,14 @@ export default class Game extends Phaser.Scene {
 
     create() {
         this.field = this.add.tileSprite(400, 300, 800, 600, 'grasstexture');
-        this.player1Image = this.add.image(0, -20, 'player1').setRotation(Math.PI/4);
+        this.player1Image = this.add.image(0, -17, 'player1').setRotation(Math.PI/4);
         this.player1Net = this.add.image(0, 0, 'tongue');
         this.player1 = this.add.container(50, 50, [this.player1Image, this.player1Net]);
-        this.player2Image = this.add.image(0, -20, 'player2').setRotation(Math.PI/4);
+        this.player1.setDepth(this.zIndexPlayer)
+        this.player2Image = this.add.image(0, -17, 'player2').setRotation(Math.PI/4);
         this.player2Net = this.add.image(0, 0, 'tongue');
         this.player2 = this.add.container(750, 550, [this.player2Image, this.player2Net]);
+        this.player2.setDepth(this.zIndexPlayer)
         this.player1Net.setOrigin(0, 1);
         this.player1Net.angle = -50;
         this.player1Net.setPosition(0, 0)
@@ -65,9 +74,10 @@ export default class Game extends Phaser.Scene {
         this.player2Net.angle = -50;
         this.player2Net.setPosition(0, 0);
         this.setButterflies();
-        //this.butterfliesGroup = this.physics.add.group(this.butterflies);
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
+        this.setPlayer1LiveGraphicsLine();
+        this.setPlayer2LiveGraphicsLine();
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
@@ -198,13 +208,19 @@ export default class Game extends Phaser.Scene {
     }
 
     setPlayer1GraphicsLine() {
-        this.player1GraphicsLine = this.add.graphics();
-        this.player1GraphicsLine.lineStyle(4, 0x000000);
+        this.player1GraphicsLine = this.add.graphics().setDepth(this.zIndexLine).lineStyle(4, 0xc500c3, .6);
     }
 
     setPlayer2GraphicsLine() {
-        this.player2GraphicsLine = this.add.graphics();
-        this.player2GraphicsLine.lineStyle(4, 0x000000);
+        this.player2GraphicsLine = this.add.graphics().setDepth(this.zIndexLine).lineStyle(4, 0xffffff, .6);
+    }
+
+    setPlayer1LiveGraphicsLine() {
+        this.player1LiveGraphicsLine = this.add.graphics().setDepth(this.zIndexLine).lineStyle(4, 0xc500c3, 1);
+    }
+
+    setPlayer2LiveGraphicsLine() {
+        this.player2LiveGraphicsLine = this.add.graphics().setDepth(this.zIndexLine).lineStyle(4, 0xffffff, 1);
     }
 
     setWelcomeText() {
@@ -231,7 +247,7 @@ export default class Game extends Phaser.Scene {
                 width: 700
             },
             align: 'center'
-        }).setOrigin(.5, 1);
+        }).setOrigin(.5, 1).setDepth(this.zIndexText);
     }
 
     setStartButton() {
@@ -253,6 +269,7 @@ export default class Game extends Phaser.Scene {
         })
         .setOrigin(.5, 1)
         .setInteractive()
+        .setDepth(this.zIndexText)
         .on('pointerover', function() {
             this.setBackgroundColor('#ff6cfe');
         })
@@ -289,7 +306,7 @@ export default class Game extends Phaser.Scene {
                 width: 700
             },
             align: 'center'
-        }).setOrigin(.5, 0);
+        }).setOrigin(.5, 0).setDepth(this.zIndexText);
     }
 
     setConfirmButton(text, x, y) {
@@ -311,6 +328,7 @@ export default class Game extends Phaser.Scene {
         })
         .setOrigin(.5, 1)
         .setInteractive()
+        .setDepth(this.zIndexText)
         .on('pointerover', function() {
             this.setBackgroundColor('#ff6cfe');
         })
@@ -348,6 +366,7 @@ export default class Game extends Phaser.Scene {
         })
         .setOrigin(.5, 1)
         .setInteractive()
+        .setDepth(this.zIndexText)
         .on('pointerover', function() {
             this.setBackgroundColor('#ddd');
         })
@@ -374,6 +393,15 @@ export default class Game extends Phaser.Scene {
         // enable drawing
         if(!this.input.activePointer.isDown && this.isDrawing) {
             this.isDrawing = false;
+            if(this.stage === 'player1Path') {
+                this.player1LiveGraphicsLine.destroy();
+                this.player1LiveGraphicsLine = null;
+                this.path.draw(this.player1GraphicsLine);
+            } else if(this.stage === 'player2Path') {
+                this.player2LiveGraphicsLine.destroy();
+                this.player2LiveGraphicsLine = null;
+                this.path.draw(this.player2GraphicsLine);
+            }
         } else if(this.input.activePointer.isDown) {
             if(!this.isDrawing) {
                 this.path = new Phaser.Curves.Path(this.input.activePointer.position.x - 2, this.input.activePointer.position.y - 2);
@@ -382,11 +410,10 @@ export default class Game extends Phaser.Scene {
                 this.path.lineTo(this.input.activePointer.position.x - 2, this.input.activePointer.position.y - 2);
             }
             if(this.stage === 'player1Path') {
-                this.path.draw(this.player1GraphicsLine);
+                this.path.draw(this.player1LiveGraphicsLine);
             } else if(this.stage === 'player2Path') {
-                this.path.draw(this.player2GraphicsLine);
+                this.path.draw(this.player2LiveGraphicsLine);
             }
-            
         }
     }
 
@@ -464,7 +491,7 @@ export default class Game extends Phaser.Scene {
             },
             align: 'center'
         })
-        .setOrigin(.5, .5);
+        .setOrigin(.5, .5).setDepth(this.zIndexText);
     }
 
     setResetGameText() {
@@ -486,6 +513,7 @@ export default class Game extends Phaser.Scene {
         })
         .setOrigin(.5, 1)
         .setInteractive()
+        .setDepth(this.zIndexText)
         .on('pointerover', function() {
             this.setBackgroundColor('#ddd');
         })
@@ -512,6 +540,8 @@ export default class Game extends Phaser.Scene {
         this.player1Path = null;
         this.player2GraphicsLine.destroy();
         this.setPlayer2GraphicsLine();
+        this.setPlayer1LiveGraphicsLine();
+        this.setPlayer2LiveGraphicsLine();
         this.player2Path = null;
         this.player1PathPoints = null;
         this.player2PathPoints =null;
@@ -533,7 +563,7 @@ export default class Game extends Phaser.Scene {
 
     setButterflies() {
         for(let i = 0; i < 15; i++) {
-            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), cmb_random_arr_el(['butterfly-blue','butterfly-white','butterfly-monarch','butterfly-orange'])).setRotation(cmb_random(0, 6.28)));
+            this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), cmb_random_arr_el(['butterfly-blue','butterfly-white','butterfly-monarch','butterfly-orange'])).setRotation(cmb_random(0, 6.28)).setDepth(this.zIndexButterfly));
         }
     }
 }
