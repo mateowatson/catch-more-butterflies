@@ -498,8 +498,8 @@ export default class Game extends Phaser.Scene {
     }
 
     resetGame() {
-        this.player1.setPosition(20, 20);
-        this.player2.setPosition(780, 580);
+        this.player1.setPosition(50, 50);
+        this.player2.setPosition(750, 550);
         this.player1.rotation = 0;
         this.player2.rotation = 0;
         this.player1Points = 0;
