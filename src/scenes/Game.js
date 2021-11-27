@@ -157,7 +157,7 @@ export default class Game extends Phaser.Scene {
                 let length = Phaser.Geom.Line.Length(ray);
                 let angle = Phaser.Geom.Line.Angle(ray);
                 let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
-                if(length < 65 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
+                if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.51) {
                     this.butterflies[i].destroy();
                     this.butterflies[i] = null;
                     this.player1Points++;
@@ -168,7 +168,7 @@ export default class Game extends Phaser.Scene {
                 let length2 = Phaser.Geom.Line.Length(ray2);
                 let angle2 = Phaser.Geom.Line.Angle(ray2);
                 let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
-                if(length2 < 65 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
+                if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.51) {
                     this.butterflies[i].destroy();
                     this.butterflies[i] = null;
                     this.player2Points++;
