@@ -8,6 +8,7 @@ export default class Game extends Phaser.Scene {
 
     init() {
         this.butterflies = [];
+        this.obstacles = [];
         this.player1 = null;
         this.player2 = null;
         this.path = null;
@@ -40,6 +41,7 @@ export default class Game extends Phaser.Scene {
         this.zIndexPlayer = 5;
         this.zIndexLine = 4;
         this.zIndexButterfly = 3;
+        this.zIndexObstacle = 2;
         this.lineAlfa = .6;
     }
 
@@ -74,6 +76,8 @@ export default class Game extends Phaser.Scene {
         this.player2Net.angle = -50;
         this.player2Net.setPosition(0, 0);
         this.setButterflies();
+        this.setObstacles();
+        //this.physics.add.group(this.obstacles);
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
         this.setPlayer1LiveGraphicsLine();
@@ -564,6 +568,51 @@ export default class Game extends Phaser.Scene {
     setButterflies() {
         for(let i = 0; i < 15; i++) {
             this.butterflies.push(this.add.image(cmb_random(80, 720), cmb_random(80, 520), cmb_random_arr_el(['butterfly-blue','butterfly-white','butterfly-monarch','butterfly-orange'])).setRotation(cmb_random(0, 6.28)).setDepth(this.zIndexButterfly));
+        }
+    }
+
+    setObstacles() {
+        for(let i = 0; i < 7; i++) {
+            this.obstacles.push(
+                this.add.image(
+                    cmb_random(80, 720),
+                    cmb_random(80, 520),
+                    cmb_random_arr_el(['obstacle-coneflower','obstacle-heliotrope','obstacle-lantana'])
+                )
+                .setDepth(this.zIndexObstacle));
+        }
+        for(let i = 0; i < 7; i++) {
+            let coinflip = cmb_random(1, 2);
+            this.obstacles.push(
+                this.add.image(
+                    this.obstacles[i].x + 30,
+                    this.obstacles[i].y,
+                    this.obstacles[i].texture.key
+                ).setDepth(this.zIndexObstacle)
+            );
+            this.obstacles.push(
+                this.add.image(
+                    this.obstacles[i].x + 60,
+                    this.obstacles[i].y,
+                    this.obstacles[i].texture.key
+                ).setDepth(this.zIndexObstacle)
+            );
+            if(coinflip === 1) {
+                this.obstacles.push(
+                    this.add.image(
+                        this.obstacles[i].x,
+                        this.obstacles[i].y + 30,
+                        this.obstacles[i].texture.key
+                    ).setDepth(this.zIndexObstacle)
+                );
+                this.obstacles.push(
+                    this.add.image(
+                        this.obstacles[i].x,
+                        this.obstacles[i].y + 60,
+                        this.obstacles[i].texture.key
+                    ).setDepth(this.zIndexObstacle)
+                );
+            }
         }
     }
 }
