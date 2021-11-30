@@ -88,6 +88,8 @@ export default class Game extends Phaser.Scene {
         this.setStartButton();
         this.setStageText();
         this.setWarningText();
+        this.player1Net.setVisible(false);
+        this.player2Net.setVisible(false);
         // this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
         // this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
         this.input.on('pointerdown', this.handlePointerDown, this);
@@ -193,45 +195,55 @@ export default class Game extends Phaser.Scene {
             this.setPlayerRotation(this.player2, this.player2PointOnPath, this.player2PathPoints);
             // set angle on net for swing
             if(this.player1NetIsSwinging) {
+                this.player1Net.setVisible(true);
                 if(this.player1Net.angle < -50 && this.player1Net.angle > -130 ) {
                     this.player1Net.angle = -50;
                     this.player1NetIsSwinging = false;
                 } else {
                     this.player1Net.angle += delta * .50;
                 }
+            } else {
+                this.player1Net.setVisible(false);
             }
             if(this.player2NetIsSwinging) {
+                this.player2Net.setVisible(true);
                 if(this.player2Net.angle < -50 && this.player2Net.angle > -230 ) {
                     this.player2Net.angle = -50;
                     this.player2NetIsSwinging = false;
                 } else {
                     this.player2Net.angle += delta * .50;
                 }
+            } else {
+                this.player2Net.setVisible(false);
             }
             // detect net collision
             for(let i = 0; i < this.butterflies.length; i++) {
                 //player1
                 if(this.butterflies[i] === null) continue;
-                let ray = new Phaser.Geom.Line(this.player1.x, this.player1.y, this.butterflies[i].x, this.butterflies[i].y);
-                let length = Phaser.Geom.Line.Length(ray);
-                let angle = Phaser.Geom.Line.Angle(ray);
-                let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
-                if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.100) {
-                    this.butterflies[i].destroy();
-                    this.butterflies[i] = null;
-                    this.player1Points++;
+                if(this.player1NetIsSwinging) {
+                    let ray = new Phaser.Geom.Line(this.player1.x, this.player1.y, this.butterflies[i].x, this.butterflies[i].y);
+                    let length = Phaser.Geom.Line.Length(ray);
+                    let angle = Phaser.Geom.Line.Angle(ray);
+                    let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
+                    if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.100) {
+                        this.butterflies[i].destroy();
+                        this.butterflies[i] = null;
+                        this.player1Points++;
+                    }
                 }
                 //player2
                 if(this.butterflies[i] === null) continue;
-                let ray2 = new Phaser.Geom.Line(this.player2.x, this.player2.y, this.butterflies[i].x, this.butterflies[i].y);
-                let length2 = Phaser.Geom.Line.Length(ray2);
-                let angle2 = Phaser.Geom.Line.Angle(ray2);
-                let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
-                if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.100
-                ) {
-                    this.butterflies[i].destroy();
-                    this.butterflies[i] = null;
-                    this.player2Points++;
+                if(this.player2NetIsSwinging) {
+                    let ray2 = new Phaser.Geom.Line(this.player2.x, this.player2.y, this.butterflies[i].x, this.butterflies[i].y);
+                    let length2 = Phaser.Geom.Line.Length(ray2);
+                    let angle2 = Phaser.Geom.Line.Angle(ray2);
+                    let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
+                    if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.100
+                    ) {
+                        this.butterflies[i].destroy();
+                        this.butterflies[i] = null;
+                        this.player2Points++;
+                    }
                 }
             }
         }
@@ -565,6 +577,8 @@ export default class Game extends Phaser.Scene {
     resetGame() {
         this.player1.setPosition(50, 50);
         this.player2.setPosition(750, 550);
+        this.player1Net.setVisible(false);
+        this.player2Net.setVisible(false);
         this.player1.rotation = 0;
         this.player2.rotation = 0;
         this.player1Points = 0;
