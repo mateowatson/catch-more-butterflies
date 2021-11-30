@@ -207,7 +207,7 @@ export default class Game extends Phaser.Scene {
             }
             if(this.player2NetIsSwinging) {
                 this.player2Net.setVisible(true);
-                if(this.player2Net.angle < -50 && this.player2Net.angle > -230 ) {
+                if(this.player2Net.angle < -50 && this.player2Net.angle > -130 ) {
                     this.player2Net.angle = -50;
                     this.player2NetIsSwinging = false;
                 } else {
@@ -225,7 +225,7 @@ export default class Game extends Phaser.Scene {
                     let length = Phaser.Geom.Line.Length(ray);
                     let angle = Phaser.Geom.Line.Angle(ray);
                     let netAngle = this.player1Net.rotation + this.player1Net.getParentRotation();
-                    if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.100) {
+                    if(length < 55 && Math.abs(angle.toFixed(3) - netAngle.toFixed(3)) < 0.300) {
                         this.butterflies[i].destroy();
                         this.butterflies[i] = null;
                         this.player1Points++;
@@ -238,8 +238,7 @@ export default class Game extends Phaser.Scene {
                     let length2 = Phaser.Geom.Line.Length(ray2);
                     let angle2 = Phaser.Geom.Line.Angle(ray2);
                     let netAngle2 = this.player2Net.rotation + this.player2Net.getParentRotation();
-                    if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.100
-                    ) {
+                    if(length2 < 55 && Math.abs(angle2.toFixed(3) - netAngle2.toFixed(3)) < 0.300) {
                         this.butterflies[i].destroy();
                         this.butterflies[i] = null;
                         this.player2Points++;
