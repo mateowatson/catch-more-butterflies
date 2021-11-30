@@ -43,6 +43,8 @@ export default class Game extends Phaser.Scene {
         this.zIndexButterfly = 3;
         this.zIndexObstacle = 2;
         this.lineAlfa = .6;
+        this.warning = '';
+        this.warningText = null;
     }
 
     preload() {
@@ -85,6 +87,7 @@ export default class Game extends Phaser.Scene {
         this.setWelcomeText();
         this.setStartButton();
         this.setStageText();
+        this.setWarningText();
         // this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
         // this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
         this.input.on('pointerdown', this.handlePointerDown, this);
@@ -93,6 +96,7 @@ export default class Game extends Phaser.Scene {
 
     update(time, delta) {
         this.stageText.setText('Player 1: '+this.player1Points+' - Player 2: '+this.player2Points);
+        this.warningText.setText(this.warning);
         if(this.player1IsDone && this.player2IsDone && this.stage === 'ingame') {
             this.stage = 'endgame';
             this.setResultsText();
@@ -110,12 +114,34 @@ export default class Game extends Phaser.Scene {
             this.enableDrawing();
         }
         if(this.stage === 'player1Path' && !this.player1Path && this.path && !this.isDrawing) {
-            this.player1Path = this.path;
-            this.stage = 'player1Path>confirm';
+            this.warning = '';
+            if(!this.intersectsObstacle()) {
+                this.player1Path = this.path;
+                this.stage = 'player1Path>confirm';
+            } else {
+                this.warning = 'You can only travel on open grass.'
+                this.path = null;
+                this.player1GraphicsLine.destroy();
+                this.setPlayer1GraphicsLine();
+                this.setPlayer1LiveGraphicsLine();
+                this.player1Path = null;
+                this.stage = 'player1Path';
+            }
         }
         if(this.stage === 'player2Path' && !this.player2Path && this.path && !this.isDrawing) {
-            this.player2Path = this.path;
-            this.stage = 'player2Path>confirm';
+            this.warning = '';
+            if(!this.intersectsObstacle()) {
+                this.player2Path = this.path;
+                this.stage = 'player2Path>confirm';
+            } else {
+                this.warning = 'You can only travel on open grass.'
+                this.path = null;
+                this.player2GraphicsLine.destroy();
+                this.setPlayer2GraphicsLine();
+                this.setPlayer2LiveGraphicsLine();
+                this.player2Path = null;
+                this.stage = 'player2Path';
+            }
         }
         if(this.stage === 'player1Path>confirm' && !this.confirmButton) {
             this.setConfirmButton('Confirm!', 200, 580);
@@ -382,11 +408,13 @@ export default class Game extends Phaser.Scene {
             if(this.stage === 'player1Path>confirm') {
                 this.player1GraphicsLine.destroy();
                 this.setPlayer1GraphicsLine();
+                this.setPlayer1LiveGraphicsLine();
                 this.player1Path = null;
                 this.stage = 'player1Path';
             } else if(this.stage === 'player2Path>confirm') {
                 this.player2GraphicsLine.destroy();
                 this.setPlayer2GraphicsLine();
+                this.setPlayer2LiveGraphicsLine();
                 this.player2Path = null;
                 this.stage = 'player2Path';
             }
@@ -394,7 +422,6 @@ export default class Game extends Phaser.Scene {
     }
 
     enableDrawing() {
-        // enable drawing
         if(!this.input.activePointer.isDown && this.isDrawing) {
             this.isDrawing = false;
             if(this.stage === 'player1Path') {
@@ -614,5 +641,49 @@ export default class Game extends Phaser.Scene {
                 );
             }
         }
+    }
+
+    setWarningText() {
+        this.warningText = this.add.text(400, 36, this.warning, {
+            fontFamily: 'sans-serif',
+            fontStyle: 'bold',
+            //backgroundColor: '#134900',
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                blur: 2,
+                stroke: true,
+                color: '#000'
+            },
+            padding: {
+                x: 12,
+                y: 12
+            },
+            fontSize: '16px',
+            stroke: '#000',
+            strokeThickness: 2,
+            wordWrap: {
+                width: 700
+            },
+            align: 'center'
+        }).setOrigin(.5, 0).setDepth(this.zIndexText);
+    }
+
+    intersectsObstacle() {
+        let spacedPoints = this.path.getSpacedPoints(this.path.getLength());
+        let intersects = false;
+        for(let i = 0; i < spacedPoints.length; i++) {
+            for(let i2 = 0; i2 < this.obstacles.length; i2++) {
+                let bounds = this.obstacles[i2].getBounds();
+                if(spacedPoints[i].x >= bounds.x && spacedPoints[i].x <= bounds.x + bounds.width && spacedPoints[i].y >= bounds.y && spacedPoints[i].y <= bounds.y + bounds.height) {
+                    intersects = true;
+                    break;
+                }
+            }
+            if(intersects) {
+                break;
+            }
+        }
+        return intersects;
     }
 }
