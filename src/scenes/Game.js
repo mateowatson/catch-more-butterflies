@@ -368,10 +368,16 @@ export default class Game extends Phaser.Scene {
         .on('pointerup', function() {
             this.path = null;
             if(this.stage === 'player1Path>confirm') {
+                this.player1GraphicsLine.setVisible(false);
                 this.stage = 'player2Path';
             } else if(this.stage === 'player2Path>confirm') {
                 // skipping countdown for now
-                setTimeout(() => {this.stage = 'ingame';}, 500);
+                this.warning = 'Ready, set, go!';
+                this.player1GraphicsLine.setVisible(true);
+                setTimeout(() => {
+                    this.warning = '';
+                    this.stage = 'ingame';
+                }, 1000);
                 
             }
         }, this);
