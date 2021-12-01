@@ -46,6 +46,8 @@ export default class Game extends Phaser.Scene {
         this.warning = '';
         this.warningText = null;
         this.music = null;
+        this.catchSound = null;
+        this.endSound = null;
     }
 
     preload() {
@@ -61,6 +63,8 @@ export default class Game extends Phaser.Scene {
         this.load.image('player1', '/assets/player1.png');
         this.load.image('player2', '/assets/player2.png');
         this.load.audio('theme', '/ignored-assets/theme.mp3', { loop: true });
+        this.load.audio('catch', '/ignored-assets/catch.ogg');
+        this.load.audio('end', '/ignored-assets/end.ogg');
     }
 
     create() {
@@ -95,15 +99,24 @@ export default class Game extends Phaser.Scene {
         this.input.on('pointerdown', this.handlePointerDown, this);
         this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this);
         this.music = this.sound.add('theme');
+        this.catchSound = this.sound.add('catch');
+        this.endSound = this.sound.add('end');
     }
 
     update(time, delta) {
-        this.stageText.setText('Player 1: '+this.player1Points+' - Player 2: '+this.player2Points);
+        this.stageText.setText('Player 1 Score: '+this.player1Points+' <<< >>> Player 2 Score: '+this.player2Points);
         this.warningText.setText(this.warning);
         if(this.player1IsDone && this.player2IsDone && this.stage === 'ingame') {
             this.stage = 'endgame';
             this.setResultsText();
             this.setResetGameText();
+            this.music.pause();
+            this.endSound.play();
+            setTimeout(() => {
+                if(!this.music.isPlaying) {
+                    this.music.resume();
+                }
+            }, 2000)
         }
         if(this.stage === 'player1Path' || this.stage === 'player2Path') {
             if(this.confirmButton) {
@@ -118,8 +131,16 @@ export default class Game extends Phaser.Scene {
         }
         if(this.stage === 'player1Path' && !this.player1Path && this.path && !this.isDrawing) {
             this.warning = '';
-            if(this.intersectsObstacle()) {
-                this.warning = 'You can only travel on open grass.'
+            if(!(this.path.getLength() > 100)) {
+                this.warning = 'Your line is not long enough. Try again.'
+                this.path = null;
+                this.player1GraphicsLine.destroy();
+                this.setPlayer1GraphicsLine();
+                this.setPlayer1LiveGraphicsLine();
+                this.player1Path = null;
+                this.stage = 'player1Path';
+            } else if(this.intersectsObstacle()) {
+                this.warning = 'You can only travel on open grass. Try again.'
                 this.path = null;
                 this.player1GraphicsLine.destroy();
                 this.setPlayer1GraphicsLine();
@@ -127,7 +148,7 @@ export default class Game extends Phaser.Scene {
                 this.player1Path = null;
                 this.stage = 'player1Path';
             } else if(!this.intersectsPlayer(this.player1)) {
-                this.warning = 'Your line has to begin on your frog.'
+                this.warning = 'Your line has to begin on your frog. Try again.'
                 this.path = null;
                 this.player1GraphicsLine.destroy();
                 this.setPlayer1GraphicsLine();
@@ -238,6 +259,7 @@ export default class Game extends Phaser.Scene {
                         this.butterflies[i].destroy();
                         this.butterflies[i] = null;
                         this.player1Points++;
+                        this.catchSound.play();
                     }
                 }
                 //player2
@@ -251,6 +273,7 @@ export default class Game extends Phaser.Scene {
                         this.butterflies[i].destroy();
                         this.butterflies[i] = null;
                         this.player2Points++;
+                        this.catchSound.play();
                     }
                 }
             }
@@ -274,8 +297,8 @@ export default class Game extends Phaser.Scene {
     }
 
     setWelcomeText() {
-        this.welcomeText = this.add.text(400, 500, 'Welcome to the field of butterflies. Each player will draw a line of the path they will take. Ready?', {
-            fontFamily: 'sans-serif',
+        this.welcomeText = this.add.text(400, 500, 'Welcome to the field of butterflies. Each player will draw a line of the path their frog will take. Then as the frogs move on their path, you must catch butterflies with their tongue. Player 1 must click to catch butterflies with the green frog, and Player 2 must press SPACE to catch butterflies with the brown frog. ARE YOU READY?', {
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             //backgroundColor: '#134900',
             shadow: {
@@ -302,7 +325,7 @@ export default class Game extends Phaser.Scene {
 
     setStartButton() {
         this.startButton = this.add.text(400, 580, 'Start!', {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#c500c3',
             padding: {
@@ -338,7 +361,7 @@ export default class Game extends Phaser.Scene {
 
     setStageText() {
         this.stageText = this.add.text(400, 12, 'welcome', {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             //backgroundColor: '#134900',
             shadow: {
@@ -352,7 +375,7 @@ export default class Game extends Phaser.Scene {
                 x: 12,
                 y: 12
             },
-            fontSize: '16px',
+            fontSize: '24px',
             stroke: '#000',
             strokeThickness: 2,
             wordWrap: {
@@ -364,7 +387,7 @@ export default class Game extends Phaser.Scene {
 
     setConfirmButton(text, x, y) {
         this.confirmButton = this.add.text(x, y, text, {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#c500c3',
             padding: {
@@ -408,7 +431,7 @@ export default class Game extends Phaser.Scene {
 
     setCancelButton(text, x, y) {
         this.cancelButton = this.add.text(x, y, text, {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#fff',
             padding: {
@@ -516,7 +539,8 @@ export default class Game extends Phaser.Scene {
         }
     }
 
-    handleKeydownSpace() {
+    handleKeydownSpace(event) {
+        event.preventDefault();
         if(this.stage === 'ingame' && this.player2NetIsSwinging === false) {
             this.player2NetIsSwinging = true;
         }
@@ -536,7 +560,7 @@ export default class Game extends Phaser.Scene {
             resultsMessage = 'Boo! It\'s a tie.';
         }
         this.resultsText = this.add.text(400, 300, resultsMessage, {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#c500c3',
             padding: {
@@ -556,7 +580,7 @@ export default class Game extends Phaser.Scene {
 
     setResetGameText() {
         this.resetGameText = this.add.text(400, 580, 'Start Another Game', {
-            fontFamily: 'sans-serif',
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             backgroundColor: '#fff',
             padding: {
@@ -582,6 +606,9 @@ export default class Game extends Phaser.Scene {
         })
         .on('pointerup', function() {
             this.resetGame();
+            if(!this.music.isPlaying) {
+                this.music.resume();
+            }
         }, this);
     }
 
@@ -675,8 +702,8 @@ export default class Game extends Phaser.Scene {
     }
 
     setWarningText() {
-        this.warningText = this.add.text(400, 36, this.warning, {
-            fontFamily: 'sans-serif',
+        this.warningText = this.add.text(400, 46, this.warning, {
+            fontFamily: '"Comic Neue", sans-serif',
             fontStyle: 'bold',
             //backgroundColor: '#134900',
             shadow: {
@@ -705,6 +732,9 @@ export default class Game extends Phaser.Scene {
         let intersects = false;
         for(let i = 0; i < spacedPoints.length; i++) {
             for(let i2 = 0; i2 < this.obstacles.length; i2++) {
+                if(!spacedPoints[i]) {
+                    break;
+                }
                 let bounds = this.obstacles[i2].getBounds();
                 if(spacedPoints[i].x >= bounds.x && spacedPoints[i].x <= bounds.x + bounds.width && spacedPoints[i].y >= bounds.y && spacedPoints[i].y <= bounds.y + bounds.height) {
                     intersects = true;
