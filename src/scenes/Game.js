@@ -71,6 +71,7 @@ export default class Game extends Phaser.Scene {
         this.player2Net = this.add.image(0, 0, 'tongue');
         this.player2 = this.add.container(750, 550, [this.player2Image, this.player2Net]);
         this.player2.setDepth(this.zIndexPlayer)
+        this.player2.setRotation(-Math.PI)
         this.player1Net.setOrigin(0, 1);
         this.player1Net.angle = -50;
         this.player1Net.setPosition(0, 0)
@@ -117,10 +118,7 @@ export default class Game extends Phaser.Scene {
         }
         if(this.stage === 'player1Path' && !this.player1Path && this.path && !this.isDrawing) {
             this.warning = '';
-            if(!this.intersectsObstacle()) {
-                this.player1Path = this.path;
-                this.stage = 'player1Path>confirm';
-            } else {
+            if(this.intersectsObstacle()) {
                 this.warning = 'You can only travel on open grass.'
                 this.path = null;
                 this.player1GraphicsLine.destroy();
@@ -128,6 +126,17 @@ export default class Game extends Phaser.Scene {
                 this.setPlayer1LiveGraphicsLine();
                 this.player1Path = null;
                 this.stage = 'player1Path';
+            } else if(!this.intersectsPlayer(this.player1)) {
+                this.warning = 'Your line has to begin on your frog.'
+                this.path = null;
+                this.player1GraphicsLine.destroy();
+                this.setPlayer1GraphicsLine();
+                this.setPlayer1LiveGraphicsLine();
+                this.player1Path = null;
+                this.stage = 'player1Path';
+            } else {
+                this.player1Path = this.path;
+                this.stage = 'player1Path>confirm';
             }
         }
         if(this.stage === 'player2Path' && !this.player2Path && this.path && !this.isDrawing) {
@@ -579,7 +588,7 @@ export default class Game extends Phaser.Scene {
         this.player1Net.setVisible(false);
         this.player2Net.setVisible(false);
         this.player1.rotation = 0;
-        this.player2.rotation = 0;
+        this.player2.rotation = -Math.PI;
         this.player1Points = 0;
         this.player2Points = 0;
         this.player1IsDone = false;
@@ -702,6 +711,16 @@ export default class Game extends Phaser.Scene {
             if(intersects) {
                 break;
             }
+        }
+        return intersects;
+    }
+
+    intersectsPlayer(player) {
+        let intersects = false;
+        let startPoint = this.path.getStartPoint();
+        let bounds = player.getBounds();
+        if(startPoint.x >= bounds.x && startPoint.x <= bounds.x + bounds.width && startPoint.y >= bounds.y && startPoint.y <= bounds.y + bounds.height) {
+            intersects = true;
         }
         return intersects;
     }

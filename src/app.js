@@ -8,18 +8,8 @@ var config = {
     scene: [Game],
     physics: {
         default: 'arcade',
-        // matter: {
-        //     enableSleeping: true,
-        //     gravity: {
-        //         y: 0
-        //     },
-        //     setBounds: true,
-        //     debug: {
-        //         showBody: true,
-        //         showStaticBody: true
-        //     }
-        // }
-    }
+    },
+    parent: 'game'
 };
 
 new Phaser.Game(config);
