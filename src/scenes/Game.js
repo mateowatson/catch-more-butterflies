@@ -51,20 +51,20 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('grasstexture', '/assets/grasstexture.png');
-        this.load.image('butterfly-blue', '/assets/blue.png');
-        this.load.image('butterfly-white', '/assets/butterfly-white.png');
-        this.load.image('butterfly-monarch', '/assets/Monarch-butterfly.png');
-        this.load.image('butterfly-orange', '/assets/orange-butterfly.png');
-        this.load.image('tongue', '/assets/tongue.png');
-        this.load.image('obstacle-coneflower', '/assets/obstacle-coneflower.png');
-        this.load.image('obstacle-heliotrope', '/assets/obstacle-heliotrope.png');
-        this.load.image('obstacle-lantana', '/assets/obstacle-lantana.png');
-        this.load.image('player1', '/assets/player1.png');
-        this.load.image('player2', '/assets/player2.png');
-        this.load.audio('theme', '/ignored-assets/theme.mp3', { loop: true });
-        this.load.audio('catch', '/ignored-assets/catch.ogg');
-        this.load.audio('end', '/ignored-assets/end.ogg');
+        this.load.image('grasstexture', 'assets/grasstexture.png');
+        this.load.image('butterfly-blue', 'assets/blue.png');
+        this.load.image('butterfly-white', 'assets/butterfly-white.png');
+        this.load.image('butterfly-monarch', 'assets/Monarch-butterfly.png');
+        this.load.image('butterfly-orange', 'assets/orange-butterfly.png');
+        this.load.image('tongue', 'assets/tongue.png');
+        this.load.image('obstacle-coneflower', 'assets/obstacle-coneflower.png');
+        this.load.image('obstacle-heliotrope', 'assets/obstacle-heliotrope.png');
+        this.load.image('obstacle-lantana', 'assets/obstacle-lantana.png');
+        this.load.image('player1', 'assets/player1.png');
+        this.load.image('player2', 'assets/player2.png');
+        this.load.audio('theme', 'ignored-assets/theme.mp3', { loop: true });
+        this.load.audio('catch', 'ignored-assets/catch.ogg');
+        this.load.audio('end', 'ignored-assets/end.ogg');
     }
 
     create() {
