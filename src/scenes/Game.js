@@ -45,6 +45,7 @@ export default class Game extends Phaser.Scene {
         this.lineAlfa = .6;
         this.warning = '';
         this.warningText = null;
+        this.music = null;
     }
 
     preload() {
@@ -59,6 +60,7 @@ export default class Game extends Phaser.Scene {
         this.load.image('obstacle-lantana', '/assets/obstacle-lantana.png');
         this.load.image('player1', '/assets/player1.png');
         this.load.image('player2', '/assets/player2.png');
+        this.load.audio('theme', '/ignored-assets/theme.mp3', { loop: true });
     }
 
     create() {
@@ -80,7 +82,6 @@ export default class Game extends Phaser.Scene {
         this.player2Net.setPosition(0, 0);
         this.setButterflies();
         this.setObstacles();
-        //this.physics.add.group(this.obstacles);
         this.setPlayer1GraphicsLine();
         this.setPlayer2GraphicsLine();
         this.setPlayer1LiveGraphicsLine();
@@ -91,10 +92,9 @@ export default class Game extends Phaser.Scene {
         this.setWarningText();
         this.player1Net.setVisible(false);
         this.player2Net.setVisible(false);
-        // this.physics.add.overlap(this.player1Net, this.butterflies, this.collectButterfly, null, this);
-        // this.physics.add.overlap(this.player2Net, this.butterflies, this.collectButterfly, null, this);
         this.input.on('pointerdown', this.handlePointerDown, this);
         this.input.keyboard.on('keydown-SPACE', this.handleKeydownSpace, this);
+        this.music = this.sound.add('theme');
     }
 
     update(time, delta) {
@@ -330,6 +330,9 @@ export default class Game extends Phaser.Scene {
             this.startButton.destroy();
             this.welcomeText.destroy();
             this.stage = 'player1Path';
+            if(!this.music.isPlaying) {
+                this.music.play();
+            }
         }, this);
     }
 

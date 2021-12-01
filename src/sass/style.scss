@@ -7,11 +7,18 @@
     align-items: center;
     background-image: url('/assets/background.png');
     min-height: 100vh;
-    h1 {
-        font-family: 'Comic Neue', cursive;
-        font-weight: 700;
+    font-family: 'Comic Neue', cursive;
+    font-weight: 700;
+    text-shadow: 4px 4px 4px #000;
+    color: #fff;
+    a {
         color: #fff;
-        text-shadow: 4px 4px 4px #000;
+
+        &:hover, &:focus {
+            color: darken(#fff, 15%);
+        }
+    }
+    h1 {
         font-size: 4em;
     }
     #game {
@@ -19,5 +26,11 @@
         height: 600px;
         width: 800px;
         box-shadow: 4px 4px 4px #000;
+    }
+    .credits {
+        margin: 24px 12px;
+        color: #fff;
+        font-size: 24px;
+        max-width: 760px;
     }
 }
